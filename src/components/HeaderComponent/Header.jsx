@@ -1,54 +1,61 @@
-const Header = () => {
+import { Link } from "react-router-dom";
+import logo from "../../assets/logo.png";
+import cart_icon from "../../assets/cart_icon.png";
+
+const Navbar = () => {
   return (
-    <header>
-      <div className="w-full bg-gray-300 py-6 px-10">
-        <nav className="flex flex-row justify-between items-center">
-          <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer">
-            jyStore
-          </div>
-          <ul className="flex basis-3/6 items-center justify-end gap-8 uppercase text-sm text-gray-500 font-medium">
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                Home
-              </a>
-            </li>
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                Product
-              </a>
-            </li>
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                Blog
-              </a>
-            </li>
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                About
-              </a>
-            </li>
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                Contact
-              </a>
-            </li>
-            <li className="nva-top-menu-item">
-              <a href="#" className="">
-                StyleGuide
-              </a>
-            </li>
-          </ul>
-          <ul className="basis-1/6 flex justify-start items-center ml-16 uppercase text-sm text-gray-600 font-medium">
-            <li className="nva-top-menu-item">
-              <a href="">
-                <span>Cart</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+    <div className="flex justify-around items-center py-4 shadow-md">
+      {/* Logo */}
+      <div className="flex items-center gap-2">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-current no-underline"
+        >
+          <img src={logo} alt="logo" className="w-[15%]" />
+          <p
+            className="text-blue-900 text-4xl font-semibold"
+            style={{ fontFamily: "Emblema One" }}
+          >
+            JYSTORE
+          </p>
+        </Link>
       </div>
-    </header>
+
+      {/* Menu */}
+      <ul
+        className="flex items-center gap-12 text-[#283165] text-lg font-semibold"
+        style={{ fontFamily: "Sen" }}
+      >
+        {[
+          { name: "Shop", path: "/" },
+          { name: "Men", path: "/mens" },
+          { name: "Women", path: "/women" },
+          { name: "Kid", path: "/kids" },
+        ].map((item) => (
+          <li key={item.name} className="nva-top-menu-item">
+            <Link to={item.path} className="no-underline text-current">
+              {item.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      {/* Login & Cart */}
+      <div className="flex items-center gap-10">
+        <Link to="/auth/login">
+          <button className=" cursor-pointer bg-blue-900 text-white px-6 py-3 rounded-full text-base font-semibold transition active:bg-[#330647]">
+            Log in
+          </button>
+        </Link>
+        <Link to="/cart" className="relative">
+          <img src={cart_icon} alt="Cart" className="w-8" />
+          <div className="absolute top-[-10px] right-[-10px] flex justify-center items-center w-6 h-6 rounded-full bg-red-500 text-white text-sm">
+            0
+          </div>
+        </Link>
+      </div>
+    </div>
   );
 };
 
-export default Header;
+export default Navbar;

@@ -64,11 +64,13 @@ const Signup = () => {
             <div className="w-full h-full flex justify-center md:items-center 2xl:px-[5%]">
               <div className="w-full max-w-[40rem] flex flex-col md:space-y-4 space-y-3 justify-start">
                 <div>
-                  <img
-                    className="w-[10rem] max-h-[5rem] scale-[1.2] overflow-hidden"
-                    src="/src/assets/logo-text.jpg"
-                    alt="JYSTORE"
-                  />
+                  <Link to="/">
+                    <img
+                      className="w-[10rem] max-h-[5rem] scale-[1.2] overflow-hidden"
+                      src="/src/assets/logo-text.png"
+                      alt="JYSTORE"
+                    />
+                  </Link>
                 </div>
                 <div className="flex flex-col space-y-3">
                   <h1 className="font-bold md:text-4xl text-xl">Đăng ký</h1>
