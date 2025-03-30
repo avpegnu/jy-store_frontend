@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { handleLoginAccount } from "../../services/auth";
+import { setStorageData } from "../../helpers/stored";
+import background from "../../assets/background.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ const Login = () => {
     const response = await handleLoginAccount({ email, password });
 
     if (response.success) {
+      setStorageData("user", response.account);
       navigate("/");
       sessionStorage.setItem("token", response.token);
     } else {
@@ -157,7 +160,7 @@ const Login = () => {
                 <div className="w-full h-full flex flex-col justify-center md:max-h-[980px]">
                   <img
                     className="h-fit lg:w-full lg:min-h-[825px] lg:max-h-none md:max-h-[40rem] sm:max-h-[30rem] max-h-[20rem]"
-                    src="https://surl.li/gaytbz"
+                    src={background}
                     alt="BackgroundImg"
                   />
                   <div className="sm:px-6 px-2 w-full absolute z-10 bottom-0 text-white">

@@ -4,3 +4,16 @@
   @apply cursor-pointer py-1 hover:text-gray-950 relative after:absolute after:bottom-0 after:left-0 
   after:bg-gray-500 after:h-0.5 after:w-0 hover:after:w-full after:transition-all after:ease-in-out after:duration-300 text-2xl;
 }
+
+/* * {
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "poppins";
+} */

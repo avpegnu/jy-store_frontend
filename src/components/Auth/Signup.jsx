@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { handleRegister } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
+import background from "../../assets/background.png";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -180,24 +181,26 @@ const Signup = () => {
           <div className="lg:w-1/2 w-full h-full lg:pb-0 pb-4">
             <div className="w-full h-full flex justify-center items-center">
               <div className="w-full h-fit relative">
-                <img
-                  className="h-fit lg:w-full lg:min-h-[825px] lg:max-h-none md:max-h-[40rem] sm:max-h-[30rem] max-h-[20rem]"
-                  src="https://surl.li/gaytbz"
-                  alt="BackgroundImg"
-                />
-                <div className="sm:px-6 px-2 w-full absolute z-10 bottom-0 text-white">
-                  <div className="bg-[rgba(0,0,0,0.2)] h-fit w-full sm:px-4 px-2 md:text-xl shadow-xl sm:py-6 py-2">
-                    <p className="font-semibold opacity-90 md:text-lg text-sm">
-                      &quot;Chào mừng bạn đến với thế giới thời trang của chúng
-                      tôi, nơi mà sự đam mê được thể hiện qua từng sản
-                      phẩm.&quot;
-                    </p>
-                    <p className="mt-4 md:text-2xl text-lg font-bold">
-                      Nguyễn Việt Anh
-                    </p>
-                    <p className="mt-2 md:text-xl text-[15px] font-medium">
-                      JYSTORE
-                    </p>
+                <div className="w-full h-full flex flex-col justify-center md:max-h-[980px]">
+                  <img
+                    className="h-fit lg:w-full lg:min-h-[825px] lg:max-h-none md:max-h-[40rem] sm:max-h-[30rem] max-h-[20rem]"
+                    src={background}
+                    alt="BackgroundImg"
+                  />
+                  <div className="sm:px-6 px-2 w-full absolute z-10 bottom-0 text-white">
+                    <div className="bg-[rgba(0,0,0,0.2)] h-fit w-full sm:px-4 px-2 md:text-xl shadow-xl sm:py-6 py-2">
+                      <p className="font-semibold opacity-90 md:text-lg text-sm">
+                        &quot;Chào mừng bạn đến với thế giới thời trang của
+                        chúng tôi, nơi mà sự đam mê được thể hiện qua từng sản
+                        phẩm.&quot;
+                      </p>
+                      <p className="mt-4 md:text-2xl text-lg font-bold">
+                        Nguyễn Việt Anh
+                      </p>
+                      <p className="mt-2 md:text-xl text-[15px] font-medium">
+                        JYSTORE
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
