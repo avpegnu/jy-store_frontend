@@ -6,6 +6,7 @@ import { GiConfirmed } from "react-icons/gi";
 import { useContext } from "react";
 import { ShopContext } from "../../context/ShopContext";
 import { createPaymentRequest } from "../../services/payment";
+import { Helmet } from "react-helmet-async";
 
 const provinces = [
   {
@@ -95,6 +96,9 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   return (
     <>
+      <Helmet>
+        <title>Thanh toán</title>
+      </Helmet>
       <section className="w-full flex justify-center items-center py-4">
         <div className="w-full max-w-screen-2xl py-4 lg:px-0 px-2">
           <div className="flex flex-row justify-center items-center w-full min-w-[20rem]">

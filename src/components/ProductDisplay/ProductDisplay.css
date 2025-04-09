@@ -34,12 +34,13 @@
   color: #3d3d3d;
   font-size: 40px;
   font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 13px;
 }
 
 .product-display-right-stars {
   display: flex;
   align-items: center;
-  margin-top: 13px;
   gap: 5px;
   color: #1c1c1c;
   font-size: 16px;
@@ -85,7 +86,7 @@
 
 .product-display-right button {
   padding: 20px 40px;
-  width: 200px;
+  width: 250px;
   font-size: 16px;
   font-weight: 600;
   color: white;
@@ -147,7 +148,7 @@
     padding: 14px 20px;
   }
   .product-display-right button {
-    width: 150px;
+    width: 180px;
     padding: 15px 0;
     margin-bottom: 20px;
   }
@@ -192,8 +193,8 @@
     font-size: 12px;
   }
   .product-display-right button {
-    width: 120px;
-    padding: 10px 0;
+    width: 150px;
+    padding: 20px 5px;
     margin-bottom: 8px;
     font-size: 12px;
   }

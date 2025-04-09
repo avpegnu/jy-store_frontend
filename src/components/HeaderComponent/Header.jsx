@@ -8,21 +8,28 @@ import nav_dropdown from "../../assets/nav_dropdown.png";
 import { getStorageData, removeStorageData } from "../../helpers/stored";
 
 const Navbar = () => {
-  const { getTotalCartItems } = useContext(ShopContext);
+  const { getTotalCartItems, resetCart, loadCartFromStorage  } = useContext(ShopContext);
   const menuRef = useRef();
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const userData = getStorageData("user", {});
-    if (userData) {
+    const userData = getStorageData("user", null);
+    if (userData && userData.name) {
       setUser(userData);
+      loadCartFromStorage();
+    } else {
+      setUser(null);
     }
   }, []);
 
   const handleLogout = () => {
     removeStorageData("user");
+    // removeStorageData("cartItems");
+    // removeStorageData("selectedItems");
+    resetCart();
     setUser(null);
+    setIsOpen(false);
   };
 
   return (
@@ -53,13 +60,13 @@ const Navbar = () => {
       <ul
         ref={menuRef}
         className="nav-menu flex items-center gap-12 text-[#283165] text-lg font-semibold"
-        style={{ fontFamily: "Sen" }}
+        style={{ fontFamily: "Roboto" }}
       >
         {[
-          { name: "Shop", path: "/" },
-          { name: "Men", path: "/mens" },
-          { name: "Women", path: "/women" },
-          { name: "Kid", path: "/kids" },
+          { name: "Trang chủ", path: "/" },
+          { name: "Nam", path: "/mens" },
+          { name: "Nữ", path: "/women" },
+          { name: "Trẻ em", path: "/kids" },
         ].map((item) => (
           <li key={item.name} className="nva-top-menu-item">
             <Link to={item.path} className="no-underline text-current">
@@ -106,12 +113,21 @@ const Navbar = () => {
             )}
           </div>
         )}
-        <Link to="/cart" className="relative">
+        <div
+          onClick={() => {
+            if (!user) {
+              window.location.href = "/auth/login";
+            } else {
+              window.location.href = "/cart";
+            }
+          }}
+          className="relative cursor-pointer"
+        >
           <img src={cart_icon} alt="Cart" className="w-8" />
           <div className="nav-cart-count absolute top-[-10px] right-[-10px] flex justify-center items-center w-6 h-6 rounded-full bg-red-500 text-white text-sm">
             {getTotalCartItems()}
           </div>
-        </Link>
+        </div>
       </div>
     </div>
   );

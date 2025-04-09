@@ -32,8 +32,17 @@ const Login = () => {
 
     if (response.success) {
       setStorageData("user", response.account);
-      navigate("/");
+
       sessionStorage.setItem("token", response.token);
+      const pending = JSON.parse(sessionStorage.getItem("pendingAddToCart"));
+      if (pending) {
+        const { itemId, size } = pending;
+        console.log("Thêm lại sản phẩm sau khi login:", itemId, size);
+        sessionStorage.removeItem("pendingAddToCart");
+        navigate(`/product/${itemId}`);
+        return;
+      }
+      navigate("/");
     } else {
       setErrorMessage(response.message);
     }

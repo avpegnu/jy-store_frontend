@@ -1,10 +1,10 @@
 // local storage
 
-export function getStorageData(key, blank = {}) {
+export function getStorageData(key, blank = null) {
   try {
     return JSON.parse(localStorage.getItem(key)) || blank;
   } catch (e) {
-    console.log("Cannot set local storage data");
+    console.log("Cannot get local storage data");
     return blank;
   }
 }

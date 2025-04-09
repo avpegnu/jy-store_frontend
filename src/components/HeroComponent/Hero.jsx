@@ -10,20 +10,25 @@ const Hero = () => {
       style={{ fontFamily: "Sen" }}
     >
       {/* Left Section */}
-      <div className="hero-left flex-1 flex flex-col justify-center gap-5 pl-44 leading-tight">
+      <div
+        className="hero-left flex-1 flex flex-col justify-center gap-5 pl-44 leading-tight"
+        style={{ fontFamily: "Roboto" }}
+      >
         <h2 className="text-[#090909] text-2xl font-semibold">
-          NEW ARRIVALS ONLY
+          SALE CHỚP NHOÁNG
         </h2>
         <div>
           <div className="hero-hand-icon flex items-center gap-5">
-            <p className="text-[#171717] text-[100px] font-bold">new</p>
+            <p className="text-[#171717] text-[100px] font-bold">35%</p>
             <img src={hand_icon} alt="hand icon" className="w-[105px]" />
           </div>
-          <p className="text-[#171717] text-[100px] font-bold">collections</p>
-          <p className="text-[#171717] text-[100px] font-bold">for everyone</p>
+          <p className="text-[#171717] text-[100px] font-bold">Ưu đãi</p>
+          <p className="text-[#171717] text-[100px] font-bold">
+            cho tất cả mọi người
+          </p>
         </div>
         <div className="hero-latest-btn flex justify-center items-center gap-4 w-[310px] h-[70px] rounded-full mt-8 bg-[#2b2264] text-white text-xl font-medium cursor-pointer hover:bg-[#211e33]">
-          <div>Latest Collection</div>
+          <div>Bộ sưu tập mới nhất</div>
           <img src={arrow_icon} alt="arrow icon" />
         </div>
       </div>
