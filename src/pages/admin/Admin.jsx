@@ -10,6 +10,7 @@ function Admin() {
       <Routes>
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path="/listproduct" element={<LisProduct />} />
+        <Route path="/updateproduct/:id" element={<AddProduct />} />
       </Routes>
     </div>
   );
