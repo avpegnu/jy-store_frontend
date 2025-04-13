@@ -242,6 +242,17 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  const removeSelectedItemsFromCart = () => {
+    const updatedCart = { ...cartItems };
+    selectedItems.forEach((key) => {
+      delete updatedCart[key];
+    });
+
+    setCartItems(updatedCart);
+    setSelectedItems([]);
+    localStorage.setItem(`cart_${user?._id}`, JSON.stringify(updatedCart));
+  };
+
   const contextValue = {
     getTotalCartItems,
     getTotalCartAmount,
@@ -256,6 +267,7 @@ const ShopContextProvider = (props) => {
     getSelectedTotalAmount,
     resetCart,
     loadCartFromStorage,
+    removeSelectedItemsFromCart,
   };
 
   return (

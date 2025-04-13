@@ -22,6 +22,7 @@ const CartItems = () => {
 
   const parsePrice = (str) => parseInt(str.replace(/\./g, ""), 10);
 
+
   return (
     <div className="cart-items">
       <div className="cart-items-format-main">
@@ -67,7 +68,7 @@ const CartItems = () => {
 
               <div className="cart-items-remove-icon">
                 <input
-                style={{ width: "20px", height: "20px" }}
+                  style={{ width: "20px", height: "20px" }}
                   type="checkbox"
                   checked={selectedItems.includes(key)}
                   onChange={() => toggleSelectItem(key)}
@@ -104,9 +105,15 @@ const CartItems = () => {
               <h3>{formatCurrency(getSelectedTotalAmount())}</h3>
             </div>
           </div>
-          <Link to="/checkout">
-            <button>Đặt hàng</button>
-          </Link>
+          {(selectedItems.length > 0 && cartItems) ? (
+            <Link to="/checkout">
+              <button>Đặt hàng</button>
+            </Link>
+          ) : (
+            <button disabled style={{ opacity: 0.6, cursor: "not-allowed" }}>
+              Vui lòng chọn sản phẩm
+            </button>
+          )}
         </div>
         <div className="cart-items-promo-code">
           <p>Nếu bạn có mã khuyến mại, hãy nhập vào đây</p>

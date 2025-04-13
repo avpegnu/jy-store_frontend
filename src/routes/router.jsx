@@ -18,6 +18,9 @@ import women_banner from "../assets/banner_women.png";
 import kid_banner from "../assets/banner_kids.png";
 import ChangePassword from "../components/Auth/Password.jsx";
 import Checkout from "../components/CheckoutComponent/Checkout.jsx";
+import Order from "../components/OrderComponent/Order.jsx";
+import Success from "../components/SuccessComponent/Success.jsx";
+import NotFound from "../components/404Component/404.jsx";
 
 // Component để kiểm tra đường dẫn
 const Layout = ({ children }) => {
@@ -58,7 +61,9 @@ const AppRouter = () => (
         </Route>
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/order" element={<Order />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   </Router>

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import arrow_icon from "../../assets/arrow.png";
 import { FaAddressCard } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
 import { GiConfirmed } from "react-icons/gi";
 import { useContext } from "react";
 import { ShopContext } from "../../context/ShopContext";
-import { createPaymentRequest } from "../../services/payment";
+
 import { Helmet } from "react-helmet-async";
+import { createOrder } from "../../services/order";
+import { getStorageData } from "../../helpers/stored";
 
 const provinces = [
   {
@@ -37,18 +39,77 @@ const provinces = [
   },
 ];
 const Checkout = () => {
-  const { getTotalCartAmount } = useContext(ShopContext);
+  const {
+    getSelectedTotalAmount,
+    selectedItems,
+    cartItems,
+    allProduct,
+    removeSelectedItemsFromCart,
+  } = useContext(ShopContext);
+
+  useEffect(() => {
+    const savedStep = localStorage.getItem("checkoutStep");
+    if (savedStep) {
+      setStep(parseInt(savedStep));
+    }
+  }, []);
 
   const [step, setStep] = useState(1);
+  const formatCurrency = (value) => {
+    return value.toLocaleString("vi-VN") + "đ";
+  };
+
+  const parsePrice = (str) => parseInt(str.replace(/\./g, ""), 10);
 
   const nextStep = async () => {
     if (step === 1 && !validateForm()) return;
-    if (step < 3) {
-      setStep(step + 1);
+
+    if (step === 2 && !paymentMethod) {
+      setPaymentMethodError(true);
       return;
     }
-    const url = await createPaymentRequest();
-    window.location.href = url?.data;
+
+    if (step < 3) {
+      setStep(step + 1);
+    }
+  };
+
+  const handleSubmitOrder = async () => {
+    const orderData = {
+      user_id: getStorageData("user")?._id || "",
+      order_status: "pending",
+      payment_status: "pending",
+      order_items: Object.entries(cartItems)
+        .filter(([key]) => selectedItems.includes(key))
+        .map(([key, quantity]) => {
+          const [productId, size] = key.split("_");
+          return {
+            ...allProduct.find((p) => p._id === productId),
+            size,
+            quantity,
+          };
+        }),
+      shipping_address: formData,
+      payment_method: paymentMethod,
+      order_total: getSelectedTotalAmount(),
+    };
+
+    try {
+      const response = await createOrder(orderData);
+      console.log("Order response:", response);
+
+      if (paymentMethod === "VNPay_bank_transfer") {
+        window.location.href = response.data;
+      } else {
+        window.location.href = response;
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+    } finally {
+      setTimeout(() => {
+        removeSelectedItemsFromCart();
+      }, 1);
+    }
   };
 
   const prevStep = () => {
@@ -68,8 +129,16 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Họ và tên không được để trống";
-    if (!formData.phone) newErrors.phone = "Số điện thoại không được để trống";
+    if (!formData.name) {
+      newErrors.name = "Họ và tên không được để trống";
+    } else if (!/^[a-zA-ZÀ-Ỹà-ỹ\s]+$/.test(formData.name)) {
+      newErrors.name = "Họ tên chỉ được chứa chữ cái và dấu cách";
+    }
+    if (!formData.phone) {
+      newErrors.phone = "Số điện thoại không được để trống";
+    } else if (!/^0\d{9}$/.test(formData.phone)) {
+      newErrors.phone = "Số điện thoại không hợp lệ. Vui lòng nhập lại";
+    }
     if (!formData.city) {
       newErrors.city = "Vui lòng chọn Tỉnh/Thành phố";
     } else {
@@ -84,16 +153,48 @@ const Checkout = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const user = getStorageData("user");
+  const userId = user?._id || "guest"; // fallback nếu chưa đăng nhập
+  const addressKey = `checkoutAddress_${userId}`;
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const newFormData = { ...formData, [e.target.name]: e.target.value };
+    setFormData(newFormData);
+    localStorage.setItem(addressKey, JSON.stringify(newFormData));
   };
+
+  useEffect(() => {
+    const savedStep = localStorage.getItem("checkoutStep");
+    if (savedStep) {
+      setStep(parseInt(savedStep));
+    }
+
+    const savedAddress = localStorage.getItem(addressKey);
+    if (savedAddress) {
+      setFormData(JSON.parse(savedAddress));
+    }
+  }, []);
 
   const selectedProvince = provinces.find((p) => p.name === formData.city);
   const selectedDistrict = selectedProvince?.districts.find(
     (d) => d.name === formData.district
   );
 
+  const [paymentMethodError, setPaymentMethodError] = useState(false);
+
   const [paymentMethod, setPaymentMethod] = useState("");
+  const getPaymentMethodLabel = (method) => {
+    switch (method) {
+      case "VNPay_bank_transfer":
+        return "Chuyển khoản bằng VNPay";
+      case "cash_on_delivery":
+        return "Thanh toán khi nhận hàng";
+      default:
+        return "Không xác định";
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -144,7 +245,7 @@ const Checkout = () => {
         </div>
       </section>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center mb-10">
         <div className="max-w-screen-2xl w-full flex flex-col md:px-0 px-2 space-y-3">
           {step === 1 && (
             <>
@@ -298,22 +399,14 @@ const Checkout = () => {
                   <input
                     type="radio"
                     name="payment"
-                    value="credit_card"
-                    checked={paymentMethod === "credit_card"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    value="VNPay_bank_transfer"
+                    checked={paymentMethod === "VNPay_bank_transfer"}
+                    onChange={(e) => {
+                      setPaymentMethod(e.target.value);
+                      setPaymentMethodError(false);
+                    }}
                   />
-                  <span>Thẻ tín dụng/Ghi nợ</span>
-                </label>
-
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="bank_transfer"
-                    checked={paymentMethod === "bank_transfer"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Chuyển khoản ngân hàng</span>
+                  <span>Chuyển khoản bằng VNPay</span>
                 </label>
 
                 <label className="flex items-center space-x-2">
@@ -322,51 +415,125 @@ const Checkout = () => {
                     name="payment"
                     value="cash_on_delivery"
                     checked={paymentMethod === "cash_on_delivery"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    onChange={(e) => {
+                      setPaymentMethod(e.target.value);
+                      setPaymentMethodError(false);
+                    }}
                   />
                   <span>Thanh toán khi nhận hàng</span>
                 </label>
               </div>
+              {paymentMethodError && (
+                <p className="text-red-500 text-sm mt-2">
+                  Vui lòng chọn phương thức thanh toán.
+                </p>
+              )}
             </>
           )}
 
           {step === 3 && (
-            <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <div className="max-w-6xl mx-auto space-y-6">
+              {/* <h2 className="text-2xl font-semibold text-gray-800 text-center">
                 Xác nhận thanh toán
-              </h2>
+              </h2> */}
 
-              <div className="mb-4">
-                <p className="text-lg font-medium text-gray-700">
-                  Địa chỉ giao hàng:
-                </p>
-                <p className="text-gray-600">
-                  {formData.name} - {formData.phone} <br />
-                  {formData.address}, {formData.ward}, {formData.district},{" "}
-                  {formData.city}
-                </p>
-              </div>
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Trái: Sản phẩm */}
+                <div className="md:w-2/3 space-y-4">
+                  {Object.entries(cartItems)
+                    .filter(([key]) => selectedItems.includes(key))
+                    .map(([key, quantity]) => {
+                      if (quantity <= 0) return null;
 
-              <div className="mb-4">
-                <p className="text-lg font-medium text-gray-700">
-                  Phương thức thanh toán:
-                </p>
-                <p className="text-gray-600">{paymentMethod}</p>
-              </div>
+                      const [productId, size] = key.split("_");
+                      const product = allProduct.find(
+                        (p) => p._id === productId
+                      );
+                      if (!product) return null;
 
-              <div className="bg-gray-100 p-4 rounded-lg mb-4">
-                <div className="flex justify-between text-lg font-medium text-gray-700">
-                  <span>Tạm tính:</span>
-                  <span>${getTotalCartAmount()}</span>
+                      return (
+                        <div
+                          key={key}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-white shadow-sm border rounded-lg p-4"
+                        >
+                          <div className="flex items-center space-x-4 w-full sm:w-1/3 pr-15">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-20 h-20 object-cover rounded-md border"
+                            />
+
+                            <p className="font-semibold text-lg pr-10">
+                              {product.name}
+                            </p>
+                          </div>
+                          <div className="flex flex-col sm:items-start text-left mt-2 sm:mt-4 ">
+                            <div>
+                              <p className="text-sm text-gray-600">
+                                Size: {size}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Giá: {product.new_price}đ
+                              </p>
+                              <p className="text-sm text-gray-600 ">
+                                Số lượng: {quantity}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col sm:items-end text-right mt-2 sm:mt-4">
+                            <p className="text-sm">Tổng</p>
+                            <p className="text-lg font-semibold text-blue-800 mt-1">
+                              {formatCurrency(
+                                parsePrice(product.new_price) * quantity
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
-                <div className="flex justify-between text-lg font-medium text-gray-700">
-                  <span>Phí vận chuyển:</span>
-                  <span>Miễn phí</span>
-                </div>
-                <hr className="my-2 border-gray-300" />
-                <div className="flex justify-between text-xl font-semibold text-gray-800">
-                  <span>Tổng cộng:</span>
-                  <span>${getTotalCartAmount()}</span>
+
+                {/* Phải: Xác nhận thanh toán */}
+                <div className="md:w-2/3 bg-white shadow-md rounded-lg p-6 space-y-6">
+                  {/* Địa chỉ */}
+                  <div>
+                    <p className="text-lg font-medium text-gray-700 mb-1">
+                      Địa chỉ giao hàng:
+                    </p>
+                    <p className="text-gray-700">
+                      {formData.name} - {formData.phone}
+                      <br />
+                      {formData.address}, {formData.ward}, {formData.district},{" "}
+                      {formData.city}
+                    </p>
+                  </div>
+
+                  {/* Phương thức thanh toán */}
+                  <div>
+                    <p className="text-lg font-medium text-gray-700 mb-1">
+                      Phương thức thanh toán:
+                    </p>
+                    <p className="text-gray-700">
+                      {getPaymentMethodLabel(paymentMethod)}
+                    </p>
+                  </div>
+
+                  {/* Tổng tiền */}
+                  <div>
+                    <div className="flex justify-between text-lg text-gray-700">
+                      <span>Tạm tính:</span>
+                      <span>{formatCurrency(getSelectedTotalAmount())}</span>
+                    </div>
+                    <div className="flex justify-between text-lg text-gray-700">
+                      <span>Phí vận chuyển:</span>
+                      <span>Miễn phí</span>
+                    </div>
+                    <hr className="my-2 border-gray-300" />
+                    <div className="flex justify-between text-xl font-semibold text-gray-800">
+                      <span>Tổng cộng:</span>
+                      <span>{formatCurrency(getSelectedTotalAmount())}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -395,9 +562,11 @@ const Checkout = () => {
               <button
                 className="bg-green-600 md:w-fit mx-auto flex flex-row items-center justify-center
                  text-white md:min-w-[15rem] w-full px-4 sm:py-5 py-3 h-fit sm:text-xl font-bold cursor-pointer ml-auto mr-0 hover:bg-green-700"
-                onClick={nextStep}
+                onClick={handleSubmitOrder}
               >
-                Xác nhận và Thanh toán
+                {paymentMethod === "cash_on_delivery"
+                  ? "Đặt hàng"
+                  : "Xác nhận và thanh toán"}
               </button>
             )}
           </div>

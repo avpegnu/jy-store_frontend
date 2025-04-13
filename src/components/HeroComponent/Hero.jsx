@@ -19,7 +19,7 @@ const Hero = () => {
         </h2>
         <div>
           <div className="hero-hand-icon flex items-center gap-5">
-            <p className="text-[#171717] text-[100px] font-bold">35%</p>
+            <p className="text-[#171717] text-[100px] font-bold">??%</p>
             <img src={hand_icon} alt="hand icon" className="w-[105px]" />
           </div>
           <p className="text-[#171717] text-[100px] font-bold">Ưu đãi</p>

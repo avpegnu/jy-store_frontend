@@ -8,10 +8,16 @@ import nav_dropdown from "../../assets/nav_dropdown.png";
 import { getStorageData, removeStorageData } from "../../helpers/stored";
 
 const Navbar = () => {
-  const { getTotalCartItems, resetCart, loadCartFromStorage  } = useContext(ShopContext);
+  const { getTotalCartItems, resetCart, loadCartFromStorage } =
+    useContext(ShopContext);
   const menuRef = useRef();
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const dropdown_toggle = (e) => {
+    menuRef.current.classList.toggle("nav-menu-visible");
+    e.target.classList.toggle("open");
+  };
 
   useEffect(() => {
     const userData = getStorageData("user", null);
@@ -53,13 +59,13 @@ const Navbar = () => {
       {/* Menu */}
       <img
         className="nav-dropdown"
-        onClick={(e) => menuRef.current.classList.toggle("nav-menu-visible")}
+        onClick={dropdown_toggle}
         src={nav_dropdown}
         alt=""
       />
       <ul
         ref={menuRef}
-        className="nav-menu flex items-center gap-12 text-[#283165] text-lg font-semibold"
+        className="nav-menu flex items-center gap-12 text-[#283165] text-lg font-semibold z-50"
         style={{ fontFamily: "Roboto" }}
       >
         {[
@@ -98,7 +104,7 @@ const Navbar = () => {
                   <Link to="/profile">Hồ sơ</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-200">
-                  <Link to="/">Đơn hàng của tôi</Link>
+                  <Link to="/order">Đơn hàng của tôi</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-200">
                   <Link to="/auth/change-password">Đổi mật khẩu</Link>

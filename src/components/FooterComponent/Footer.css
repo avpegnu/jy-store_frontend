@@ -5,7 +5,8 @@
   align-items: center;
   gap: 50px;
   background: linear-gradient(180deg, #223179 0%, #7f8be722 60%);
-  margin-top: 50px;
+  margin-top: 0px;
+  /* margin-bottom: 0px; */
 }
 
 .footer-logo {

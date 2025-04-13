@@ -42,7 +42,12 @@ const Login = () => {
         navigate(`/product/${itemId}`);
         return;
       }
-      navigate("/");
+      // navigate("/");
+      if (response.account.role === "admin") {
+        window.location.href = "http://localhost:5174/";
+      } else {
+        navigate("/");
+      }
     } else {
       setErrorMessage(response.message);
     }
