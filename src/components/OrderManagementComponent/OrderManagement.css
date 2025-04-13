@@ -1,0 +1,156 @@
+.manage-orders {
+  box-sizing: border-box;
+  width: 82%;
+  padding: 30px 50px;
+  margin: 20px auto;
+  border-radius: 6px;
+  background: white;
+  overflow: hidden;
+}
+
+.order-table-container {
+  overflow-x: auto;
+  max-height: 86vh;
+}
+
+.manage-orders h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  min-width: 1000px; /* Đảm bảo có scroll khi cần */
+}
+
+.order-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f2f2f2;
+  z-index: 1;
+}
+
+.order-table th,
+.order-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.order-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.order-table td {
+  background-color: #fff;
+  font-size: 14px;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.product-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.product-item strong {
+  margin-right: 5px;
+}
+
+.product-item ul {
+  padding-left: 20px;
+}
+
+.product-item td p {
+  margin: 0;
+}
+
+
+@media (max-width: 1024px) {
+  .manage-orders {
+    padding: 20px 30px;
+  }
+
+  .order-table {
+    font-size: 13px;
+    min-width: 900px;
+  }
+
+  .order-table th,
+  .order-table td {
+    padding: 8px;
+  }
+
+  .product-item {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .manage-orders {
+    padding: 15px 20px;
+  }
+
+  .order-table {
+    font-size: 12px;
+    min-width: 800px;
+  }
+
+  .order-table th,
+  .order-table td {
+    padding: 6px;
+  }
+
+  .product-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .product-item img {
+    margin-bottom: 5px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .manage-orders {
+    padding: 10px 10px;
+  }
+
+  .order-table {
+    font-size: 11px;
+    min-width: 700px;
+  }
+
+  .order-table th,
+  .order-table td {
+    padding: 4px;
+  }
+
+  .product-item img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-item strong {
+    font-size: 13px;
+  }
+
+  /* Ẩn cột phương thức thanh toán trên điện thoại */
+  .order-table th:nth-child(6),
+  .order-table td:nth-child(6) {
+    display: none;
+  }
+}

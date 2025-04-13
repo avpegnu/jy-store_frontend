@@ -1,0 +1,12 @@
+.revenue {
+  padding: 20px;
+}
+
+.revenue-select {
+  margin-bottom: 20px;
+}
+
+.revenue-select select {
+  padding: 5px;
+  font-size: 16px;
+}
