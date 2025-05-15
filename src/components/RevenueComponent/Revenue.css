@@ -1,12 +1,86 @@
-.revenue {
-  padding: 20px;
+.revenue-container {
+  padding: 5px 20px;
+  max-width: 1500px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
-.revenue-select {
-  margin-bottom: 20px;
+.revenue-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
 }
 
-.revenue-select select {
-  padding: 5px;
+.revenue-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.revenue-filter select,
+.revenue-filter input,
+.revenue-filter button {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.revenue-filter button {
+  background-color: #914caf;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.revenue-filter button:hover {
+  background-color: #743d8c;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  width: 100%;
+}
+
+.chart-box {
+  padding: 5x;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.chart-box-pie {
+  padding: 5px 0 5px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.chart-box h3 {
+  text-align: center;
   font-size: 16px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.chart-box-pie h3 {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #444;
 }

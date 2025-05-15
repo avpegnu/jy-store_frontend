@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./OrderManagement.css";
+import { FiSearch, FiFilter } from "react-icons/fi";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [sortByTotal, setSortByTotal] = useState(""); // asc | desc
 
   const fetchOrders = async () => {
     try {
@@ -21,21 +28,6 @@ const OrderManagement = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-
-  // const translateOrderStatus = (status) => {
-  //   switch (status) {
-  //     case "pending":
-  //       return "Đang xử lý";
-  //     case "shipping":
-  //       return "Đang giao hàng";
-  //     case "completed":
-  //       return "Hoàn tất";
-  //     case "cancelled":
-  //       return "Đã huỷ";
-  //     default:
-  //       return "Không xác định";
-  //   }
-  // };
 
   const translatePaymentMethod = (method) => {
     switch (method) {
@@ -60,7 +52,6 @@ const OrderManagement = () => {
 
       if (!res.ok) throw new Error("Lỗi khi cập nhật trạng thái");
 
-      // Cập nhật lại danh sách đơn hàng sau khi thay đổi trạng thái
       const updatedOrders = orders.map((order) =>
         order._id === orderId ? { ...order, order_status: newStatus } : order
       );
@@ -70,13 +61,119 @@ const OrderManagement = () => {
     }
   };
 
+  const filteredOrders = orders
+    .filter((order) => {
+      const matchSearch =
+        order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.shipping_address?.name || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      const matchStatus = statusFilter
+        ? order.order_status === statusFilter
+        : true;
+
+      const matchPayment = paymentFilter
+        ? order.payment_method === paymentFilter
+        : true;
+
+      const createdAt = new Date(order.createdAt);
+      const matchStartDate = startDate
+        ? createdAt >= new Date(startDate)
+        : true;
+      const matchEndDate = endDate ? createdAt <= new Date(endDate) : true;
+
+      return (
+        matchSearch &&
+        matchStatus &&
+        matchPayment &&
+        matchStartDate &&
+        matchEndDate
+      );
+    })
+    .sort((a, b) => {
+      if (!sortByTotal) return 0;
+      const totalA = a.order_total;
+      const totalB = b.order_total;
+      return sortByTotal === "asc" ? totalA - totalB : totalB - totalA;
+    });
+
   if (loading) return <p>Đang tải đơn hàng...</p>;
 
   return (
     <div className="manage-orders">
       <h2>Quản lý đơn hàng</h2>
-      {orders.length === 0 ? (
-        <p>Hiện tại không có đơn hàng nào.</p>
+
+      <div className="order-filters">
+        <div className="filter-group">
+          <FiSearch className="icon" />
+          <input
+            type="text"
+            placeholder="Tìm mã đơn, người nhận..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="filter-group">
+          <FiFilter className="icon" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Đang xử lý</option>
+            <option value="shipping">Đang giao hàng</option>
+            <option value="completed">Hoàn tất</option>
+            <option value="cancelled">Đã huỷ</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Từ ngày</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+
+        <div className="filter-group">
+          <label>Đến ngày</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+
+        <div className="filter-group">
+          <label>Thanh toán</label>
+          <select
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+          >
+            <option value="">Tất cả</option>
+            <option value="cash_on_delivery">Khi nhận hàng</option>
+            <option value="VNPay_bank_transfer">VNPay</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Sắp xếp</label>
+          <select
+            value={sortByTotal}
+            onChange={(e) => setSortByTotal(e.target.value)}
+          >
+            <option value="">-- Theo tổng tiền --</option>
+            <option value="asc">Tăng dần</option>
+            <option value="desc">Giảm dần</option>
+          </select>
+        </div>
+      </div>
+
+      {filteredOrders.length === 0 ? (
+        <p>Không tìm thấy đơn hàng phù hợp.</p>
       ) : (
         <div className="order-table-container">
           <table className="order-table">
@@ -92,7 +189,7 @@ const OrderManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order._id}>
                   <td>{order._id}</td>
                   <td>{new Date(order.createdAt).toLocaleString()}</td>
@@ -125,9 +222,7 @@ const OrderManagement = () => {
                       <p>Không có địa chỉ</p>
                     )}
                   </td>
-                  <td>
-                    {translatePaymentMethod(order.payment_method) || "Chưa chọn"}
-                  </td>
+                  <td>{translatePaymentMethod(order.payment_method)}</td>
                   <td>
                     {order.order_items && order.order_items.length > 0 ? (
                       <ul>
@@ -140,7 +235,14 @@ const OrderManagement = () => {
                             />
                             <strong>{item.name}</strong> Size: {item.size} - Số
                             lượng: {item.quantity} - Giá:{" "}
-                            {item.new_price && !isNaN(Number(item.new_price))
+                            {item.new_price &&
+                            !isNaN(
+                              Number(
+                                item.new_price
+                                  .replace(/\./g, "")
+                                  .replace(",", ".")
+                              )
+                            )
                               ? Number(
                                   item.new_price
                                     .replace(/\./g, "")
@@ -149,7 +251,7 @@ const OrderManagement = () => {
                                   style: "currency",
                                   currency: "VND",
                                 })
-                              : "Giá không hợp lệ"}{" "}
+                              : "Giá không hợp lệ"}
                           </li>
                         ))}
                       </ul>

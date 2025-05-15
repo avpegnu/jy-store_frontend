@@ -33,6 +33,20 @@ function Sidebar() {
           </p>
         </div>
       </Link>
+      <Link to={"/chatbox"} style={{ textDecoration: "none" }}>
+        <div className="sidebar-item">
+          <p className="sidebar-item-text">
+            <span className="icon-management">💬</span> Trả lời khách hàng
+          </p>
+        </div>
+      </Link>
+      <Link to={"/accountmanagement"} style={{ textDecoration: "none" }}>
+        <div className="sidebar-item">
+          <p className="sidebar-item-text">
+            <span className="icon-management">🧑‍💼 </span> Quản lý tài khoản
+          </p>
+        </div>
+      </Link>
     </div>
   );
 }

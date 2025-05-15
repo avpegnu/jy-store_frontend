@@ -6,6 +6,9 @@
   border-radius: 6px;
   background: white;
 }
+.list-product h1 {
+  text-align: center;
+}
 
 .list-product-table-container {
   max-height: 86vh;
@@ -36,7 +39,7 @@
 
 .product-table th {
   font-weight: bold;
-  background-color: #f2f2f2;
+  background-color: #dceaf5;
 }
 
 .list-product-icon {
