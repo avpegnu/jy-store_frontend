@@ -22,7 +22,6 @@ const CartItems = () => {
 
   const parsePrice = (str) => parseInt(str.replace(/\./g, ""), 10);
 
-
   return (
     <div className="cart-items">
       <div className="cart-items-format-main">
@@ -105,7 +104,7 @@ const CartItems = () => {
               <h3>{formatCurrency(getSelectedTotalAmount())}</h3>
             </div>
           </div>
-          {(selectedItems.length > 0 && cartItems) ? (
+          {selectedItems.length > 0 && cartItems ? (
             <Link to="/checkout">
               <button>Đặt hàng</button>
             </Link>

@@ -44,7 +44,11 @@ const Login = () => {
       }
       // navigate("/");
       if (response.account.role === "admin") {
-        window.location.href = "http://localhost:5174/";
+        window.location.href =
+          "http://localhost:5174?id=" +
+          response.account._id +
+          "&name=" +
+          response.account.name;
       } else {
         navigate("/");
       }

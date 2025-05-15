@@ -100,13 +100,22 @@ const Navbar = () => {
             </button>
             {isOpen && (
               <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg overflow-hidden">
-                <li className="px-4 py-2 hover:bg-gray-200">
+                <li
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 hover:bg-gray-200"
+                >
                   <Link to="/profile">Hồ sơ</Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200">
+                <li
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 hover:bg-gray-200"
+                >
                   <Link to="/order">Đơn hàng của tôi</Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200">
+                <li
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 hover:bg-gray-200"
+                >
                   <Link to="/auth/change-password">Đổi mật khẩu</Link>
                 </li>
                 <li

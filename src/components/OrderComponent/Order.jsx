@@ -6,12 +6,15 @@ import {
 } from "../../services/order";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import RatingModal from "../RatingModalComponent/RatingModal";
+import { createReview } from "../../services/review";
 
 const statusLabels = {
   pending: "🔄 Đang xử lý",
   shipping: "🚚 Đang giao",
   completed: "✅ Đã hoàn tất",
   cancelled: "❌ Đã huỷ",
+  reviewed: "⭐ Đã đánh giá", // Thêm trạng thái 'reviewed'
 };
 
 const translatePaymentMethod = (method) => {
@@ -35,6 +38,8 @@ const getStatusColor = (status) => {
       return "text-green-600 bg-green-100";
     case "cancelled":
       return "text-red-500 bg-red-100";
+    case "reviewed":
+      return "text-gray-500 bg-gray-100";
     default:
       return "text-gray-600 bg-gray-100";
   }
@@ -48,13 +53,19 @@ const Order = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [currentReviewProduct, setCurrentReviewProduct] = useState(null);
+
+  const [reviewedProducts, setReviewedProducts] = useState(new Set());
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
   const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?._id;
+  const user_id = user?._id;
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await getOrdersByUserId(userId);
+      const data = await getOrdersByUserId(user_id);
       setOrders(data);
     } catch (err) {
       console.error("Lỗi khi lấy đơn hàng:", err);
@@ -90,16 +101,39 @@ const Order = () => {
     }
   };
 
-  const handleRepurchase = (orderId) => {
-    console.log(`Đánh giá đơn hàng ${orderId}`);
-    // TODO: popup đánh giá
+  const handleOpenReview = (product) => {
+    setCurrentReviewProduct(product);
+    setShowRatingModal(true);
+  };
+  console.log("currentReviewProduct", currentReviewProduct);
+  const handleSubmitReview = async (reviewData) => {
+    try {
+      Promise.all([
+        createReview({ ...reviewData, user_id }),
+        updateOrderStatus(currentReviewProduct._id, "reviewed"),
+      ]);
+      // Cập nhật lại danh sách đơn hàng trong state
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === currentReviewProduct._id
+            ? { ...order, order_status: "reviewed" }
+            : order
+        )
+      );
+
+      setReviewSuccess(true);
+      setShowRatingModal(false);
+      setTimeout(() => setReviewSuccess(false), 3000); // Tự động ẩn thông báo sau 3s
+    } catch (err) {
+      console.error("Lỗi gửi đánh giá:", err);
+    }
   };
 
   useEffect(() => {
-    if (userId) fetchOrders();
-  }, [userId]);
+    if (user_id) fetchOrders();
+  }, [user_id]);
 
-  if (!userId)
+  if (!user_id)
     return (
       <p className="text-center mt-10">Vui lòng đăng nhập để xem đơn hàng.</p>
     );
@@ -111,6 +145,12 @@ const Order = () => {
 
   return (
     <>
+      {reviewSuccess && (
+        <div className="text-green-600 mt-4">
+          Đánh giá thành công! Cảm ơn bạn đã chia sẻ ý kiến.
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto p-4 flex flex-col md:flex-row gap-6">
         {/* Sidebar Tabs */}
         <div className="md:w-1/4">
@@ -210,7 +250,7 @@ const Order = () => {
                             className="w-24 h-24 object-cover rounded-lg border"
                           />
                         </Link>
-                        <div className="text-sm space-y-1">
+                        <div className="flex-1 text-sm space-y-1">
                           <p className="font-medium text-base">{item.name}</p>
                           <p>
                             Size:{" "}
@@ -228,6 +268,20 @@ const Order = () => {
                               {item.new_price} VND
                             </span>
                           </p>
+                          {order.order_status === "completed" &&
+                            !reviewedProducts.has(item._id) && (
+                              <button
+                                onClick={() => handleOpenReview(item)}
+                                className="mt-2 px-3 py-1 rounded bg-blue-800 text-white hover:bg-blue-900 text-sm"
+                              >
+                                Đánh giá
+                              </button>
+                            )}
+                          {reviewedProducts.has(item._id) && (
+                            <button className="mt-2 px-3 py-1 rounded bg-blue-800 text-white hover:bg-blue-900 text-sm">
+                              Mua lại
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -236,12 +290,7 @@ const Order = () => {
 
                 <div className="mt-5 text-right">
                   {order.order_status === "completed" ? (
-                    <button
-                      onClick={() => handleRepurchase(order._id)}
-                      className="px-4 py-2 rounded-lg font-semibold text-white bg-blue-800 hover:bg-blue-900 cursor-pointer"
-                    >
-                      Đánh giá
-                    </button>
+                    <></>
                   ) : (
                     <div className="flex justify-end gap-4">
                       <button
@@ -277,6 +326,8 @@ const Order = () => {
           )}
         </div>
       </div>
+
+      {/* Modal huỷ đơn */}
       {showCancelModal && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
@@ -305,6 +356,15 @@ const Order = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal đánh giá */}
+      {showRatingModal && (
+        <RatingModal
+          product={currentReviewProduct}
+          onClose={() => setShowRatingModal(false)}
+          onSubmit={handleSubmitReview}
+        />
       )}
     </>
   );

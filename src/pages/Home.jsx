@@ -8,9 +8,11 @@ import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { updateOrderStatus } from "../services/order";
+import ChatWidget from "../components/ChatWidgetComponent/ChatWidget";
+import {getStorageData} from "../helpers/stored";
 const Home = () => {
   const location = useLocation();
-  console.log(location.search);
+  const userId = getStorageData("user")?._id || null;
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -39,6 +41,7 @@ const Home = () => {
         <Offers />
         <NewCollections />
         <NewsLetter />
+        <ChatWidget userId={userId} />
       </>
     </>
   );
